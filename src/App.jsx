@@ -4,6 +4,7 @@ import CircleOfFifths from './components/CircleOfFifths/CircleOfFifths.jsx';
 import InfoPanel from './components/InfoPanel/InfoPanel.jsx';
 import InfoPanelChrod from './components/InfoPanel/InfoPanelChrod.jsx';
 import QuizMode from './components/QuizMode/QuizMode.jsx';
+import { ChordPlayer } from './components/ChordPlayer/index.js';
 
 function AppContent() {
   const { state, dispatch } = useAppContext();
@@ -42,6 +43,7 @@ function AppContent() {
             <div>
               <InfoPanel />
               <InfoPanelChrod />
+              <ChordPlayer />
             </div>
           </>
         ) : (

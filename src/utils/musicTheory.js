@@ -277,30 +277,9 @@ export function getChordRoot(chordName) {
   return match ? match[0] : chordName;
 }
 
-// Construire les notes d'un accord (triade basique)
+// Construire les notes d'un accord (supporte tous les types)
 export function getChordNotes(chordName) {
   const root = getChordRoot(chordName);
-
-  // Toutes les notes chromatiques (dièses et bémols)
-  const allNotes = [
-    "C",
-    "C#",
-    "D",
-    "D#",
-    "E",
-    "F",
-    "F#",
-    "G",
-    "G#",
-    "A",
-    "A#",
-    "B",
-    "Db",
-    "Eb",
-    "Gb",
-    "Ab",
-    "Bb",
-  ];
 
   // Table de conversion pour normaliser les notes
   const normalizeNote = (note) => {
@@ -351,26 +330,65 @@ export function getChordNotes(chordName) {
     return [root, root, root]; // Fallback
   }
 
-  // Déterminer le type d'accord
-  const isMinor = chordName.includes("m") && !chordName.includes("dim");
-  const isDim = chordName.includes("dim") || chordName.includes("°");
+  // Fonction pour obtenir une note à partir d'un intervalle
+  const getNote = (interval) => chromaticScale[(rootIndex + interval) % 12];
 
-  // Intervalles en demi-tons
-  const thirdInterval = isMinor || isDim ? 3 : 4; // tierce mineure ou majeure
-  const fifthInterval = isDim ? 6 : 7; // quinte diminuée ou juste
+  // Extraire le suffixe (qualité) de l'accord
+  const suffix = chordName.replace(/^[A-G][#b]?/, "");
 
-  // Construire la triade en utilisant la note originale pour la racine
-  const triad = [
-    root, // Note racine originale (peut être bémol)
-    chromaticScale[(rootIndex + thirdInterval) % 12], // Tierce
-    chromaticScale[(rootIndex + fifthInterval) % 12], // Quinte
-  ];
+  // Définir les intervalles pour chaque type d'accord
+  // Intervalles en demi-tons: 1=min2nd, 2=maj2nd, 3=min3rd, 4=maj3rd, 5=P4th, 6=dim5th, 7=P5th, 8=aug5th, 9=maj6th, 10=min7th, 11=maj7th
+  const chordIntervals = {
+    // Triades de base
+    "": [0, 4, 7],                    // Majeur
+    "m": [0, 3, 7],                   // Mineur
+    "dim": [0, 3, 6],                 // Diminué
+    "aug": [0, 4, 8],                 // Augmenté
+    "5": [0, 7],                      // Power chord
 
-  // console.log(
-  //   `getChordNotes(${chordName}): root=${root}, normalized=${normalizedRoot}, index=${rootIndex}, triad=[${triad.join(", ")}]`
-  // );
+    // Suspendus
+    "sus2": [0, 2, 7],
+    "sus4": [0, 5, 7],
 
-  return triad;
+    // Septièmes
+    "7": [0, 4, 7, 10],               // Dominant 7
+    "maj7": [0, 4, 7, 11],            // Major 7
+    "m7": [0, 3, 7, 10],              // Minor 7
+    "mMaj7": [0, 3, 7, 11],           // Minor major 7
+    "dim7": [0, 3, 6, 9],             // Diminished 7
+    "m7b5": [0, 3, 6, 10],            // Half-diminished 7
+    "7sus4": [0, 5, 7, 10],           // Dominant 7 sus4
+
+    // Sixièmes
+    "6": [0, 4, 7, 9],                // Major 6
+    "m6": [0, 3, 7, 9],               // Minor 6
+
+    // Extensions
+    "add9": [0, 4, 7, 14],            // Add 9
+    "9": [0, 4, 7, 10, 14],           // Dominant 9
+    "maj9": [0, 4, 7, 11, 14],        // Major 9
+    "m9": [0, 3, 7, 10, 14],          // Minor 9
+    "11": [0, 4, 7, 10, 14, 17],      // Dominant 11
+    "13": [0, 4, 7, 10, 14, 21],      // Dominant 13
+
+    // Altérés
+    "7b5": [0, 4, 6, 10],             // Dominant 7 flat 5
+    "7#5": [0, 4, 8, 10],             // Dominant 7 sharp 5
+    "7b9": [0, 4, 7, 10, 13],         // Dominant 7 flat 9
+    "7#9": [0, 4, 7, 10, 15],         // Dominant 7 sharp 9
+    "7#11": [0, 4, 7, 10, 18],        // Dominant 7 sharp 11
+  };
+
+  // Obtenir les intervalles pour ce type d'accord, ou utiliser majeur par défaut
+  const intervals = chordIntervals[suffix] || chordIntervals[""];
+
+  // Construire l'accord
+  const notes = intervals.map((interval) => {
+    if (interval === 0) return root; // Garder la note racine originale
+    return getNote(interval);
+  });
+
+  return notes;
 }
 
 // Générer une gamme modale à partir d'une tonalité et d'un mode

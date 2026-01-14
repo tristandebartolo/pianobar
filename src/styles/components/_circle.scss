@@ -47,6 +47,7 @@
 
       &__label {
         transition: fill $transition-fast;
+        text-shadow: 1px 1px 5px #000;
       }
 
       &:hover {
@@ -65,13 +66,14 @@
         .key-segment__label {
           font-size: 18px;
           font-weight: 700;
+          
         }
       }
 
       &--highlighted {
         .key-segment__path {
           filter: brightness(1.15);
-          animation: pulse 1.5s ease-in-out infinite;
+          // animation: pulse 1.5s ease-in-out infinite;
           outline: none;
         }
       }
