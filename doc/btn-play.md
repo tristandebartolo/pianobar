@@ -19,10 +19,10 @@ Cette fonctionnalité répond aux besoins des musiciens qui veulent :
 
 - **Position** : Bouton ▶ à gauche de chaque titre "Section X"
 - **États visuels** :
-  - Gris : Inactif
-  - orange : En cours de lecture
-  - bleu : Lecture en boucle
-  - violet : Lecture en attente
+  - Gris : Inactif (▶)
+  - orange : En cours de lecture (▶)
+  - bleu : Lecture en boucle (⟲)
+  - violet : Lecture en attente (⏳)
 
 ### Comportements
 
@@ -68,42 +68,3 @@ Cette fonctionnalité répond aux besoins des musiciens qui veulent :
 ## Résultat Attendu
 
 Les utilisateurs peuvent maintenant pratiquer efficacement en isolant des sections spécifiques ou en démarrant depuis n'importe quel point de leur composition, avec une interface intuitive et des contrôles coordonnés.
-
-```js
-     {section.chords.length > 0 && (
-      <button
-        className="chord-player__section-btn"
-        onClick={() => shuffleSectionChords(sectionIndex)}
-        title="Mélanger les accords"
-      >
-        🔀
-      </button>
-    )}
-```
-
-```js
-// Mélanger les accords d'une section
-const shuffleSectionChords = useCallback(
-  (sectionIndex) => {
-    const section = sections[sectionIndex];
-    if (section.chords.length === 0) return;
-
-    const positions = section.chords.map((chord) => chord.startBeat);
-    const durations = section.chords.map((chord) => chord.duration);
-    const names = section.chords.map((chord) => chord.name);
-    const shuffledNames = [...names].sort(() => Math.random() - 0.5);
-
-    const shuffledChords = section.chords.map((chord, i) => ({
-      ...chord,
-      name: shuffledNames[i],
-    }));
-
-    setSections(
-      sections.map((s, i) =>
-        i === sectionIndex ? { ...s, chords: shuffledChords } : s,
-      ),
-    );
-  },
-  [sections],
-);
-```
