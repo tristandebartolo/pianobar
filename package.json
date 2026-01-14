@@ -1,0 +1,57 @@
+{
+	"name": "cercle-des-quintes",
+	"version": "1.0.0",
+	"main": "index.js",
+	"browserslist": {
+		"production": [
+			">0.2%",
+			"not dead",
+			"not op_mini all",
+			"ie >= 9"
+		],
+		"development": [
+			"last 1 chrome version",
+			"last 1 firefox version",
+			"last 1 safari version",
+			"ie >= 9"
+		]
+	},
+	"scripts": {
+		"build": "webpack --config webpack.config.js  --mode production",
+		"build:dev": "webpack --config webpack.config.js --mode development",
+		"start": "webpack --watch",
+		"start:dev": "webpack --watch --mode development",
+		"lint": "eslint \"src/**/*.{js,jsx}\" --quiet"
+	},
+	"author": "tontonCode",
+	"dependencies": {
+		"core-js": "^3.47.0",
+		"framer-motion": "^12.26.1",
+		"react": "^19.2.3",
+		"react-dom": "^19.2.3"
+	},
+	"devDependencies": {
+		"@babel/core": "^7.28.6",
+		"@babel/preset-env": "^7.28.6",
+		"@babel/preset-react": "^7.28.5",
+		"@babel/preset-typescript": "^7.28.5",
+		"@pmmmwh/react-refresh-webpack-plugin": "^0.6.2",
+		"babel-loader": "^10.0.0",
+		"css-loader": "^7.1.2",
+		"eslint": "^9.39.2",
+		"eslint-config-prettier": "^10.1.8",
+		"eslint-plugin-prettier": "^5.5.4",
+		"eslint-plugin-react": "^7.37.5",
+		"eslint-plugin-react-hooks": "^7.0.1",
+		"html-webpack-plugin": "^5.6.5",
+		"mini-css-extract-plugin": "^2.9.4",
+		"prettier": "^3.7.4",
+		"react-refresh": "^0.18.0",
+		"sass": "^1.97.2",
+		"sass-loader": "^16.0.6",
+		"style-loader": "^4.0.0",
+		"webpack": "^5.104.1",
+		"webpack-cli": "^6.0.1",
+		"webpack-dev-server": "^5.2.3"
+	}
+}

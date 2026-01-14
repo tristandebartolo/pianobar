@@ -1,0 +1,119 @@
+@import '../variables';
+@import '../mixins';
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, $bg-navy 0%, lighten($bg-navy, 5%) 100%);
+}
+
+.app-header {
+  padding: $space-lg $space-xl;
+  background: rgba($surface-navy, 0.8);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid $border-color;
+  @include shadow('sm');
+
+  @include mobile {
+    padding: $space-md;
+  }
+
+  &__content {
+    @include flex-between;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  &__title {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    color: $text-light;
+    margin: 0;
+
+    @include mobile {
+      font-size: $font-size-xl;
+    }
+  }
+
+  &__subtitle {
+    font-size: $font-size-sm;
+    color: $text-muted;
+    margin-top: $space-xs;
+  }
+
+  &__quiz-button {
+    padding: $space-sm $space-lg;
+    background: $primary-purple;
+    color: $text-light;
+    border: none;
+    border-radius: $radius-md;
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+    cursor: pointer;
+    transition: all $transition-fast;
+
+    &:hover {
+      background: lighten($primary-purple, 10%);
+      transform: translateY(-2px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+
+    @include mobile {
+      padding: $space-xs $space-md;
+      font-size: $font-size-sm;
+    }
+  }
+}
+
+.app-main {
+  flex: 1;
+  padding: $space-lg;
+  display: flex;
+  gap: $space-lg;
+  align-items: stretch;
+  justify-content: center;
+  max-width: 1600px;
+  width: 100%;
+  margin: 0 auto;
+
+  @include mobile {
+    flex-direction: column;
+    padding: $space-md;
+    gap: $space-md;
+  }
+
+  @include tablet {
+    padding: $space-md;
+    gap: $space-md;
+  }
+}
+
+.app-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.app-footer {
+  padding: $space-lg;
+  text-align: center;
+  color: $text-muted;
+  font-size: $font-size-sm;
+  border-top: 1px solid $border-color;
+  background: rgba($surface-navy, 0.5);
+
+  a {
+    color: $primary-purple;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

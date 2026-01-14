@@ -1,0 +1,451 @@
+@import '../variables';
+@import '../mixins';
+
+.quiz-mode {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: $space-xl;
+  background: $surface-navy;
+  border-radius: $radius-lg;
+  @include shadow('lg');
+  animation: fadeIn 0.3s $ease-smooth;
+
+  @include mobile {
+    padding: $space-lg;
+  }
+}
+
+// Loading
+.quiz-loading {
+  @include flex-column-center;
+  padding: $space-xxxl;
+
+  &__spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid $surface-light;
+    border-top-color: $primary-purple;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: $space-lg;
+  }
+
+  p {
+    color: $text-muted;
+    font-size: $font-size-lg;
+  }
+}
+
+// Header
+.quiz-header {
+  margin-bottom: $space-xl;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: $space-md;
+}
+
+.quiz-progress {
+  flex: 1;
+  min-width: 200px;
+
+  &__bar {
+    height: 8px;
+    background: $surface-light;
+    border-radius: $radius-round;
+    overflow: hidden;
+    margin-bottom: $space-sm;
+  }
+
+  &__fill {
+    height: 100%;
+    background: linear-gradient(90deg, $primary-purple, lighten($primary-purple, 10%));
+    border-radius: $radius-round;
+    transition: width 0.5s $ease-smooth;
+  }
+
+  &__text {
+    font-size: $font-size-sm;
+    color: $text-muted;
+    font-weight: $font-weight-medium;
+  }
+}
+
+.quiz-score {
+  font-size: $font-size-lg;
+  color: $text-light;
+  font-weight: $font-weight-semibold;
+
+  &__value {
+    color: $primary-purple;
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+  }
+}
+
+// Question
+.quiz-question {
+  margin-bottom: $space-xl;
+
+  &__text {
+    font-size: $font-size-2xl;
+    color: $text-light;
+    margin-bottom: $space-xl;
+    text-align: center;
+
+    @include mobile {
+      font-size: $font-size-xl;
+    }
+  }
+
+  &__options {
+    display: flex;
+    flex-direction: column;
+    gap: $space-md;
+    margin-bottom: $space-lg;
+  }
+}
+
+.quiz-option {
+  display: flex;
+  align-items: center;
+  gap: $space-md;
+  padding: $space-md $space-lg;
+  background: $surface-light;
+  border: 2px solid transparent;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: all $transition-fast;
+  font-size: $font-size-lg;
+  color: $text-light;
+  text-align: left;
+  @include shadow('sm');
+
+  &:hover:not(&--disabled) {
+    transform: translateY(-2px);
+    @include shadow('md');
+    border-color: $primary-purple;
+  }
+
+  &:active:not(&--disabled) {
+    transform: translateY(0);
+  }
+
+  &--selected {
+    background: lighten($surface-light, 5%);
+    border-color: $primary-purple;
+    @include glow($primary-purple);
+  }
+
+  &--correct {
+    background: rgba($primary-green, 0.2);
+    border-color: $primary-green;
+    cursor: default;
+
+    &:hover {
+      transform: none;
+    }
+  }
+
+  &--incorrect {
+    background: rgba(#F44336, 0.2);
+    border-color: #F44336;
+    cursor: default;
+
+    &:hover {
+      transform: none;
+    }
+  }
+
+  &--disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &__letter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: rgba($primary-purple, 0.2);
+    border-radius: 50%;
+    font-weight: $font-weight-bold;
+    flex-shrink: 0;
+  }
+
+  &__text {
+    flex: 1;
+  }
+
+  &__icon {
+    font-size: $font-size-2xl;
+    flex-shrink: 0;
+  }
+}
+
+// Feedback
+.quiz-feedback {
+  padding: $space-lg;
+  border-radius: $radius-md;
+  margin-top: $space-lg;
+  animation: slideInUp 0.3s $ease-smooth;
+
+  &--correct {
+    background: rgba($primary-green, 0.1);
+    border-left: 4px solid $primary-green;
+  }
+
+  &--incorrect {
+    background: rgba(#F44336, 0.1);
+    border-left: 4px solid #F44336;
+  }
+
+  &__header {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-bold;
+    color: $text-light;
+    margin-bottom: $space-sm;
+  }
+
+  &__explanation {
+    font-size: $font-size-base;
+    color: $text-light;
+    line-height: 1.6;
+  }
+}
+
+// Actions
+.quiz-actions {
+  display: flex;
+  justify-content: center;
+  gap: $space-md;
+}
+
+.quiz-button {
+  padding: $space-md $space-xl;
+  border: none;
+  border-radius: $radius-md;
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  cursor: pointer;
+  transition: all $transition-fast;
+  @include shadow('md');
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+
+    &:hover {
+      transform: none;
+    }
+  }
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    @include shadow('lg');
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &--primary {
+    background: linear-gradient(135deg, $primary-purple, lighten($primary-purple, 10%));
+    color: white;
+    min-width: 200px;
+  }
+
+  &--next {
+    background: linear-gradient(135deg, $primary-green, lighten($primary-green, 10%));
+    color: white;
+    min-width: 200px;
+  }
+
+  &--secondary {
+    background: $surface-light;
+    color: $text-light;
+    min-width: 200px;
+
+    &:hover:not(:disabled) {
+      background: lighten($surface-light, 5%);
+    }
+  }
+}
+
+// Results
+.quiz-results {
+  animation: fadeIn 0.5s $ease-smooth;
+
+  &__header {
+    text-align: center;
+    margin-bottom: $space-xl;
+  }
+
+  &__emoji {
+    font-size: 5rem;
+    margin-bottom: $space-md;
+  }
+
+  &__title {
+    font-size: $font-size-3xl;
+    color: $text-light;
+    margin-bottom: $space-sm;
+  }
+
+  &__grade {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+  }
+
+  &__score {
+    @include flex-center;
+    margin-bottom: $space-xl;
+  }
+
+  &__score-circle {
+    position: relative;
+    width: 200px;
+    height: 200px;
+  }
+
+  &__score-svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  &__score-text {
+    @include absolute-center;
+    text-align: center;
+  }
+
+  &__percentage {
+    font-size: $font-size-3xl;
+    font-weight: $font-weight-bold;
+    color: $text-light;
+  }
+
+  &__fraction {
+    font-size: $font-size-lg;
+    color: $text-muted;
+  }
+
+  &__details {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: $space-md;
+    margin-bottom: $space-xl;
+
+    @include mobile {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__stat {
+    background: $surface-light;
+    padding: $space-lg;
+    border-radius: $radius-md;
+    text-align: center;
+
+    &-label {
+      display: block;
+      font-size: $font-size-sm;
+      color: $text-muted;
+      margin-bottom: $space-sm;
+    }
+
+    &-value {
+      display: block;
+      font-size: $font-size-2xl;
+      font-weight: $font-weight-bold;
+      color: $text-light;
+    }
+  }
+
+  &__breakdown {
+    margin-bottom: $space-xl;
+
+    h3 {
+      font-size: $font-size-xl;
+      color: $text-light;
+      margin-bottom: $space-lg;
+      text-align: center;
+    }
+  }
+
+  &__answers {
+    max-height: 400px;
+    overflow-y: auto;
+    @include custom-scrollbar;
+  }
+
+  &__actions {
+    display: flex;
+    gap: $space-md;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+}
+
+.quiz-answer-item {
+  display: flex;
+  align-items: flex-start;
+  gap: $space-md;
+  padding: $space-md;
+  background: $surface-light;
+  border-radius: $radius-md;
+  margin-bottom: $space-sm;
+  border-left: 4px solid transparent;
+
+  &--correct {
+    border-left-color: $primary-green;
+  }
+
+  &--incorrect {
+    border-left-color: #F44336;
+  }
+
+  &__number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: rgba($primary-purple, 0.2);
+    border-radius: 50%;
+    font-weight: $font-weight-bold;
+    font-size: $font-size-sm;
+    color: $text-light;
+    flex-shrink: 0;
+  }
+
+  &__icon {
+    font-size: $font-size-xl;
+    flex-shrink: 0;
+  }
+
+  &__text {
+    flex: 1;
+  }
+
+  &__question {
+    font-size: $font-size-sm;
+    color: $text-light;
+    margin-bottom: $space-xs;
+  }
+
+  &__answer {
+    font-size: $font-size-xs;
+    color: $text-muted;
+
+    strong {
+      color: $text-light;
+    }
+  }
+
+  &__correct {
+    color: $primary-green;
+  }
+}

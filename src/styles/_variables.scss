@@ -1,0 +1,83 @@
+// Couleurs principales
+$primary-purple: #6C63FF;
+$primary-green: #4CAF50;
+$accent-amber: #FFB74D;
+$bg-navy: #1A1B2E;
+$surface-navy: #2D2E42;
+$surface-light: #3A3B52;
+$text-light: #E0E0E0;
+$text-muted: #A0A0A0;
+$border-color: rgba(224, 224, 224, 0.1);
+
+// Typographie
+$font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+$font-secondary: 'Playfair Display', serif;
+
+$font-size-xs: 0.75rem;    // 12px
+$font-size-sm: 0.875rem;   // 14px
+$font-size-base: 1rem;     // 16px
+$font-size-lg: 1.125rem;   // 18px
+$font-size-xl: 1.25rem;    // 20px
+$font-size-2xl: 1.5rem;    // 24px
+$font-size-3xl: 2rem;      // 32px
+
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+// Espacements (système basé sur 8px)
+$space-xs: 4px;
+$space-sm: 8px;
+$space-md: 16px;
+$space-lg: 24px;
+$space-xl: 32px;
+$space-xxl: 48px;
+$space-xxxl: 64px;
+
+// Ombres
+$shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+$shadow-md: 0 4px 8px rgba(0, 0, 0, 0.15);
+$shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.2);
+$shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.25);
+$shadow-glow: 0 0 20px rgba(108, 99, 255, 0.3);
+$shadow-glow-green: 0 0 20px rgba(76, 175, 80, 0.3);
+$shadow-glow-amber: 0 0 20px rgba(255, 183, 77, 0.3);
+
+// Transitions
+$ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+$ease-in: cubic-bezier(0.4, 0, 1, 1);
+$ease-out: cubic-bezier(0, 0, 0.2, 1);
+$ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+$transition-fast: 150ms $ease-out;
+$transition-base: 300ms $ease-smooth;
+$transition-slow: 500ms $ease-smooth;
+
+// Dimensions du cercle
+$circle-outer-radius: 200px;
+$circle-inner-radius: 140px;
+$circle-center-radius: 80px;
+$circle-segment-gap: 2px;
+
+// Breakpoints
+$breakpoint-mobile: 480px;
+$breakpoint-tablet: 768px;
+$breakpoint-desktop: 1024px;
+$breakpoint-wide: 1440px;
+
+// Border radius
+$radius-sm: 4px;
+$radius-md: 8px;
+$radius-lg: 12px;
+$radius-xl: 16px;
+$radius-round: 9999px;
+
+// Z-index layers
+$z-base: 1;
+$z-dropdown: 10;
+$z-sticky: 20;
+$z-fixed: 30;
+$z-modal-backdrop: 40;
+$z-modal: 50;
+$z-tooltip: 60;
