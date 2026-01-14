@@ -1,31 +1,106 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { audioSystem } from '../../utils/audioSystem.js';
-import { getChordNotes, getNoteColor } from '../../utils/musicTheory.js';
-import ChordEditModal from './ChordEditModal.jsx';
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import { audioSystem } from "../../utils/audioSystem.js";
+import { getChordNotes, getNoteColor } from "../../utils/musicTheory.js";
+import ChordEditModal from "./ChordEditModal.jsx";
 
 // Générer un ID unique
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
 // Clé localStorage
-const STORAGE_KEY = 'chord-player-playlists';
+const STORAGE_KEY = "chord-player-playlists";
 
 // Progressions disponibles avec noms et descriptions
 const PROGRESSIONS = [
-  { name: 'I-V-vi-IV', label: 'Pop (Axis)', chords: ['C', 'G', 'Am', 'F'], description: 'La progression la plus utilisée en pop' },
-  { name: 'vi-IV-I-V', label: 'Ballade', chords: ['Am', 'F', 'C', 'G'], description: 'Version émotionnelle de l\'Axis' },
-  { name: 'I-vi-IV-V', label: '50s Doo-wop', chords: ['C', 'Am', 'F', 'G'], description: 'Classique des années 50' },
-  { name: 'ii-V-I', label: 'Jazz ii-V-I', chords: ['Dm7', 'G7', 'Cmaj7'], description: 'La cadence jazz fondamentale' },
-  { name: 'I-IV-V-I', label: 'Blues/Rock', chords: ['C', 'F', 'G', 'C'], description: 'Base du blues et rock' },
-  { name: 'i-iv-V-i', label: 'Mineur classique', chords: ['Am', 'Dm', 'E', 'Am'], description: 'Progression mineure dramatique' },
-  { name: 'I-V-vi-iii-IV', label: 'Canon Pachelbel', chords: ['C', 'G', 'Am', 'Em', 'F'], description: 'Inspiré du Canon de Pachelbel' },
-  { name: 'i-VII-VI-V', label: 'Andalouse', chords: ['Am', 'G', 'F', 'E'], description: 'Cadence flamenco/andalouse' },
-  { name: 'I-bVII-IV-I', label: 'Rock modal', chords: ['C', 'Bb', 'F', 'C'], description: 'Rock classique avec bVII' },
-  { name: 'vi-V-IV-III', label: 'Epic', chords: ['Am', 'G', 'F', 'E'], description: 'Progression épique cinématique' },
-  { name: 'I-IV-vi-V', label: 'Moderne', chords: ['C', 'F', 'Am', 'G'], description: 'Pop contemporaine' },
-  { name: 'i-VI-III-VII', label: 'Mineur pop', chords: ['Am', 'F', 'C', 'G'], description: 'Mineur accessible' },
-  { name: 'ii-V-I-VI', label: 'Rhythm Changes', chords: ['Dm7', 'G7', 'Cmaj7', 'A7'], description: 'Variation jazz' },
-  { name: 'I-iii-IV-V', label: 'Romantique', chords: ['C', 'Em', 'F', 'G'], description: 'Doux et romantique' },
-  { name: 'i-i-iv-V', label: '12 Bar Minor', chords: ['Am', 'Am', 'Dm', 'E'], description: 'Blues mineur simplifié' },
+  {
+    name: "I-V-vi-IV",
+    label: "Pop (Axis)",
+    chords: ["C", "G", "Am", "F"],
+    description: "La progression la plus utilisée en pop",
+  },
+  {
+    name: "vi-IV-I-V",
+    label: "Ballade",
+    chords: ["Am", "F", "C", "G"],
+    description: "Version émotionnelle de l'Axis",
+  },
+  {
+    name: "I-vi-IV-V",
+    label: "50s Doo-wop",
+    chords: ["C", "Am", "F", "G"],
+    description: "Classique des années 50",
+  },
+  {
+    name: "ii-V-I",
+    label: "Jazz ii-V-I",
+    chords: ["Dm7", "G7", "Cmaj7"],
+    description: "La cadence jazz fondamentale",
+  },
+  {
+    name: "I-IV-V-I",
+    label: "Blues/Rock",
+    chords: ["C", "F", "G", "C"],
+    description: "Base du blues et rock",
+  },
+  {
+    name: "i-iv-V-i",
+    label: "Mineur classique",
+    chords: ["Am", "Dm", "E", "Am"],
+    description: "Progression mineure dramatique",
+  },
+  {
+    name: "I-V-vi-iii-IV",
+    label: "Canon Pachelbel",
+    chords: ["C", "G", "Am", "Em", "F"],
+    description: "Inspiré du Canon de Pachelbel",
+  },
+  {
+    name: "i-VII-VI-V",
+    label: "Andalouse",
+    chords: ["Am", "G", "F", "E"],
+    description: "Cadence flamenco/andalouse",
+  },
+  {
+    name: "I-bVII-IV-I",
+    label: "Rock modal",
+    chords: ["C", "Bb", "F", "C"],
+    description: "Rock classique avec bVII",
+  },
+  {
+    name: "vi-V-IV-III",
+    label: "Epic",
+    chords: ["Am", "G", "F", "E"],
+    description: "Progression épique cinématique",
+  },
+  {
+    name: "I-IV-vi-V",
+    label: "Moderne",
+    chords: ["C", "F", "Am", "G"],
+    description: "Pop contemporaine",
+  },
+  {
+    name: "i-VI-III-VII",
+    label: "Mineur pop",
+    chords: ["Am", "F", "C", "G"],
+    description: "Mineur accessible",
+  },
+  {
+    name: "ii-V-I-VI",
+    label: "Rhythm Changes",
+    chords: ["Dm7", "G7", "Cmaj7", "A7"],
+    description: "Variation jazz",
+  },
+  {
+    name: "I-iii-IV-V",
+    label: "Romantique",
+    chords: ["C", "Em", "F", "G"],
+    description: "Doux et romantique",
+  },
+  {
+    name: "i-i-iv-V",
+    label: "12 Bar Minor",
+    chords: ["Am", "Am", "Dm", "E"],
+    description: "Blues mineur simplifié",
+  },
 ];
 
 const BEATS_PER_SECTION = 16;
@@ -44,7 +119,7 @@ function ChordPlayer() {
   const [clipboard, setClipboard] = useState(null);
   const [playlists, setPlaylists] = useState([]);
   const [showPlaylistModal, setShowPlaylistModal] = useState(false);
-  const [newPlaylistName, setNewPlaylistName] = useState('');
+  const [newPlaylistName, setNewPlaylistName] = useState("");
   const [editingPlaylistId, setEditingPlaylistId] = useState(null);
   const [showProgressionMenu, setShowProgressionMenu] = useState(null); // sectionIndex ou null
 
@@ -71,7 +146,7 @@ function ChordPlayer() {
         setPlaylists(JSON.parse(saved));
       }
     } catch (e) {
-      console.error('Erreur de chargement des playlists:', e);
+      console.error("Erreur de chargement des playlists:", e);
     }
   }, []);
 
@@ -81,7 +156,7 @@ function ChordPlayer() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(newPlaylists));
     } catch (e) {
-      console.error('Erreur de sauvegarde des playlists:', e);
+      console.error("Erreur de sauvegarde des playlists:", e);
     }
   }, []);
 
@@ -117,7 +192,9 @@ function ChordPlayer() {
       const currentBpm = bpmRef.current;
       const totalBeatsNow = currentSections.length * BEATS_PER_SECTION;
 
-      const sectionIndex = Math.floor(globalBeatRef.current / BEATS_PER_SECTION);
+      const sectionIndex = Math.floor(
+        globalBeatRef.current / BEATS_PER_SECTION
+      );
       const beatInSection = globalBeatRef.current % BEATS_PER_SECTION;
 
       setCurrentSection(sectionIndex);
@@ -126,7 +203,7 @@ function ChordPlayer() {
       // Trouver l'accord dans la section courante
       const section = currentSections[sectionIndex];
       if (section) {
-        const chord = section.chords.find(c => c.startBeat === beatInSection);
+        const chord = section.chords.find((c) => c.startBeat === beatInSection);
         if (chord) {
           const notes = getChordNotes(chord.name);
           const chordDuration = (chord.duration * 60) / currentBpm;
@@ -164,193 +241,278 @@ function ChordPlayer() {
   }, [sections]);
 
   // Supprimer une section
-  const removeSection = useCallback((sectionIndex) => {
-    if (sections.length <= 1) return;
-    stopPlayback();
-    setSections(sections.filter((_, i) => i !== sectionIndex));
-  }, [sections, stopPlayback]);
+  const removeSection = useCallback(
+    (sectionIndex) => {
+      if (sections.length <= 1) return;
+      stopPlayback();
+      setSections(sections.filter((_, i) => i !== sectionIndex));
+    },
+    [sections, stopPlayback]
+  );
 
   // Dupliquer une section
-  const duplicateSection = useCallback((sectionIndex) => {
-    const sectionToCopy = sections[sectionIndex];
-    const newSection = {
-      id: generateId(),
-      chords: sectionToCopy.chords.map(chord => ({
-        ...chord,
+  const duplicateSection = useCallback(
+    (sectionIndex) => {
+      const sectionToCopy = sections[sectionIndex];
+      const newSection = {
         id: generateId(),
-      })),
-    };
-    const newSections = [...sections];
-    newSections.splice(sectionIndex + 1, 0, newSection);
-    setSections(newSections);
-  }, [sections]);
+        chords: sectionToCopy.chords.map((chord) => ({
+          ...chord,
+          id: generateId(),
+        })),
+      };
+      const newSections = [...sections];
+      newSections.splice(sectionIndex + 1, 0, newSection);
+      setSections(newSections);
+    },
+    [sections]
+  );
+
+  // Mélanger les accords d'une section
+  const shuffleSectionChords = useCallback(
+    (sectionIndex) => {
+      const section = sections[sectionIndex];
+      if (section.chords.length === 0) return;
+
+      const positions = section.chords.map((chord) => chord.startBeat);
+      const durations = section.chords.map((chord) => chord.duration);
+      const names = section.chords.map((chord) => chord.name);
+      const shuffledNames = [...names].sort(() => Math.random() - 0.5);
+
+      const shuffledChords = section.chords.map((chord, i) => ({
+        ...chord,
+        name: shuffledNames[i],
+      }));
+
+      setSections(
+        sections.map((s, i) =>
+          i === sectionIndex ? { ...s, chords: shuffledChords } : s
+        )
+      );
+    },
+    [sections]
+  );
 
   // Copier une section dans le presse-papier
-  const copySection = useCallback((sectionIndex) => {
-    const sectionToCopy = sections[sectionIndex];
-    setClipboard({
-      chords: sectionToCopy.chords.map(chord => ({ ...chord })),
-    });
-  }, [sections]);
+  const copySection = useCallback(
+    (sectionIndex) => {
+      const sectionToCopy = sections[sectionIndex];
+      setClipboard({
+        chords: sectionToCopy.chords.map((chord) => ({ ...chord })),
+      });
+    },
+    [sections]
+  );
 
   // Coller le contenu du presse-papier dans une section
-  const pasteSection = useCallback((sectionIndex) => {
-    if (!clipboard) return;
+  const pasteSection = useCallback(
+    (sectionIndex) => {
+      if (!clipboard) return;
 
-    const newChords = clipboard.chords.map(chord => ({
-      ...chord,
-      id: generateId(),
-    }));
-
-    setSections(sections.map((section, i) =>
-      i === sectionIndex ? { ...section, chords: newChords } : section
-    ));
-  }, [clipboard, sections]);
-
-  // Sauvegarder la session actuelle comme playlist
-  const saveAsPlaylist = useCallback((name) => {
-    if (!name.trim()) return;
-
-    const newPlaylist = {
-      id: generateId(),
-      name: name.trim(),
-      bpm,
-      sections: sections.map(section => ({
-        id: generateId(),
-        chords: section.chords.map(chord => ({ ...chord })),
-      })),
-      createdAt: new Date().toISOString(),
-    };
-
-    const updatedPlaylists = [...playlists, newPlaylist];
-    savePlaylists(updatedPlaylists);
-    setNewPlaylistName('');
-    setShowPlaylistModal(false);
-  }, [bpm, sections, playlists, savePlaylists]);
-
-  // Charger une playlist
-  const loadPlaylist = useCallback((playlistId) => {
-    const playlist = playlists.find(p => p.id === playlistId);
-    if (!playlist) return;
-
-    stopPlayback();
-    setBpm(playlist.bpm);
-    setSections(playlist.sections.map(section => ({
-      id: generateId(),
-      chords: section.chords.map(chord => ({
+      const newChords = clipboard.chords.map((chord) => ({
         ...chord,
         id: generateId(),
-      })),
-    })));
-    setShowPlaylistModal(false);
-  }, [playlists, stopPlayback]);
+      }));
+
+      setSections(
+        sections.map((section, i) =>
+          i === sectionIndex ? { ...section, chords: newChords } : section
+        )
+      );
+    },
+    [clipboard, sections]
+  );
+
+  // Sauvegarder la session actuelle comme playlist
+  const saveAsPlaylist = useCallback(
+    (name) => {
+      if (!name.trim()) return;
+
+      const newPlaylist = {
+        id: generateId(),
+        name: name.trim(),
+        bpm,
+        sections: sections.map((section) => ({
+          id: generateId(),
+          chords: section.chords.map((chord) => ({ ...chord })),
+        })),
+        createdAt: new Date().toISOString(),
+      };
+
+      const updatedPlaylists = [...playlists, newPlaylist];
+      savePlaylists(updatedPlaylists);
+      setNewPlaylistName("");
+      setShowPlaylistModal(false);
+    },
+    [bpm, sections, playlists, savePlaylists]
+  );
+
+  // Charger une playlist
+  const loadPlaylist = useCallback(
+    (playlistId) => {
+      const playlist = playlists.find((p) => p.id === playlistId);
+      if (!playlist) return;
+
+      stopPlayback();
+      setBpm(playlist.bpm);
+      setSections(
+        playlist.sections.map((section) => ({
+          id: generateId(),
+          chords: section.chords.map((chord) => ({
+            ...chord,
+            id: generateId(),
+          })),
+        }))
+      );
+      setShowPlaylistModal(false);
+    },
+    [playlists, stopPlayback]
+  );
 
   // Mettre à jour une playlist existante
-  const updatePlaylist = useCallback((playlistId) => {
-    const updatedPlaylists = playlists.map(p =>
-      p.id === playlistId
-        ? {
-            ...p,
-            bpm,
-            sections: sections.map(section => ({
-              id: generateId(),
-              chords: section.chords.map(chord => ({ ...chord })),
-            })),
-            updatedAt: new Date().toISOString(),
-          }
-        : p
-    );
-    savePlaylists(updatedPlaylists);
-    setEditingPlaylistId(null);
-  }, [bpm, sections, playlists, savePlaylists]);
+  const updatePlaylist = useCallback(
+    (playlistId) => {
+      const updatedPlaylists = playlists.map((p) =>
+        p.id === playlistId
+          ? {
+              ...p,
+              bpm,
+              sections: sections.map((section) => ({
+                id: generateId(),
+                chords: section.chords.map((chord) => ({ ...chord })),
+              })),
+              updatedAt: new Date().toISOString(),
+            }
+          : p
+      );
+      savePlaylists(updatedPlaylists);
+      setEditingPlaylistId(null);
+    },
+    [bpm, sections, playlists, savePlaylists]
+  );
 
   // Supprimer une playlist
-  const deletePlaylist = useCallback((playlistId) => {
-    const updatedPlaylists = playlists.filter(p => p.id !== playlistId);
-    savePlaylists(updatedPlaylists);
-  }, [playlists, savePlaylists]);
+  const deletePlaylist = useCallback(
+    (playlistId) => {
+      const updatedPlaylists = playlists.filter((p) => p.id !== playlistId);
+      savePlaylists(updatedPlaylists);
+    },
+    [playlists, savePlaylists]
+  );
 
   // Appliquer une progression à une section
-  const applyProgression = useCallback((sectionIndex, progression) => {
-    stopPlayback();
-    const chordCount = progression.chords.length;
-    const beatsPerChord = Math.floor(BEATS_PER_SECTION / chordCount);
+  const applyProgression = useCallback(
+    (sectionIndex, progression) => {
+      stopPlayback();
+      const chordCount = progression.chords.length;
+      const beatsPerChord = Math.floor(BEATS_PER_SECTION / chordCount);
 
-    const newChords = progression.chords.map((chord, index) => ({
-      id: generateId(),
-      name: chord,
-      startBeat: index * beatsPerChord,
-      duration: beatsPerChord,
-    }));
+      const newChords = progression.chords.map((chord, index) => ({
+        id: generateId(),
+        name: chord,
+        startBeat: index * beatsPerChord,
+        duration: beatsPerChord,
+      }));
 
-    setSections(sections.map((section, i) =>
-      i === sectionIndex ? { ...section, chords: newChords } : section
-    ));
-    setShowProgressionMenu(null);
-  }, [stopPlayback, sections]);
+      setSections(
+        sections.map((section, i) =>
+          i === sectionIndex ? { ...section, chords: newChords } : section
+        )
+      );
+      setShowProgressionMenu(null);
+    },
+    [stopPlayback, sections]
+  );
 
   // Générer une progression aléatoire (pour compatibilité)
-  const generateChords = useCallback((sectionIndex = 0) => {
-    const randomProgression = PROGRESSIONS[Math.floor(Math.random() * PROGRESSIONS.length)];
-    applyProgression(sectionIndex, randomProgression);
-  }, [applyProgression]);
+  const generateChords = useCallback(
+    (sectionIndex = 0) => {
+      const randomProgression =
+        PROGRESSIONS[Math.floor(Math.random() * PROGRESSIONS.length)];
+      applyProgression(sectionIndex, randomProgression);
+    },
+    [applyProgression]
+  );
 
   // Ajouter un accord à un beat dans une section
-  const addChord = useCallback((sectionIndex, beat) => {
-    const section = sections[sectionIndex];
-    const existingChord = section.chords.find(c =>
-      beat >= c.startBeat && beat < c.startBeat + c.duration
-    );
+  const addChord = useCallback(
+    (sectionIndex, beat) => {
+      const section = sections[sectionIndex];
+      const existingChord = section.chords.find(
+        (c) => beat >= c.startBeat && beat < c.startBeat + c.duration
+      );
 
-    if (existingChord) {
-      setSelectedChord(existingChord);
+      if (existingChord) {
+        setSelectedChord(existingChord);
+        setSelectedSectionIndex(sectionIndex);
+        setIsModalOpen(true);
+        return;
+      }
+
+      const newChord = {
+        id: generateId(),
+        name: "C",
+        startBeat: beat,
+        duration: 1,
+      };
+
+      setSections(
+        sections.map((s, i) =>
+          i === sectionIndex ? { ...s, chords: [...s.chords, newChord] } : s
+        )
+      );
+      setSelectedChord(newChord);
       setSelectedSectionIndex(sectionIndex);
       setIsModalOpen(true);
-      return;
-    }
-
-    const newChord = {
-      id: generateId(),
-      name: 'C',
-      startBeat: beat,
-      duration: 1,
-    };
-
-    setSections(sections.map((s, i) =>
-      i === sectionIndex ? { ...s, chords: [...s.chords, newChord] } : s
-    ));
-    setSelectedChord(newChord);
-    setSelectedSectionIndex(sectionIndex);
-    setIsModalOpen(true);
-  }, [sections]);
+    },
+    [sections]
+  );
 
   // Mettre à jour un accord
-  const updateChord = useCallback((updatedChord) => {
-    if (selectedSectionIndex === null) return;
+  const updateChord = useCallback(
+    (updatedChord) => {
+      if (selectedSectionIndex === null) return;
 
-    setSections(sections.map((section, i) =>
-      i === selectedSectionIndex
-        ? { ...section, chords: section.chords.map(c => c.id === updatedChord.id ? updatedChord : c) }
-        : section
-    ));
-    setIsModalOpen(false);
-    setSelectedChord(null);
-    setSelectedSectionIndex(null);
-  }, [sections, selectedSectionIndex]);
+      setSections(
+        sections.map((section, i) =>
+          i === selectedSectionIndex
+            ? {
+                ...section,
+                chords: section.chords.map((c) =>
+                  c.id === updatedChord.id ? updatedChord : c
+                ),
+              }
+            : section
+        )
+      );
+      setIsModalOpen(false);
+      setSelectedChord(null);
+      setSelectedSectionIndex(null);
+    },
+    [sections, selectedSectionIndex]
+  );
 
   // Supprimer un accord
-  const deleteChord = useCallback((chordId) => {
-    if (selectedSectionIndex === null) return;
+  const deleteChord = useCallback(
+    (chordId) => {
+      if (selectedSectionIndex === null) return;
 
-    setSections(sections.map((section, i) =>
-      i === selectedSectionIndex
-        ? { ...section, chords: section.chords.filter(c => c.id !== chordId) }
-        : section
-    ));
-    setIsModalOpen(false);
-    setSelectedChord(null);
-    setSelectedSectionIndex(null);
-  }, [sections, selectedSectionIndex]);
+      setSections(
+        sections.map((section, i) =>
+          i === selectedSectionIndex
+            ? {
+                ...section,
+                chords: section.chords.filter((c) => c.id !== chordId),
+              }
+            : section
+        )
+      );
+      setIsModalOpen(false);
+      setSelectedChord(null);
+      setSelectedSectionIndex(null);
+    },
+    [sections, selectedSectionIndex]
+  );
 
   // Gestion du drag pour redimensionner
   const handleMouseDown = useCallback((e, sectionIndex, chord, edge) => {
@@ -365,43 +527,56 @@ function ChordPlayer() {
     });
   }, []);
 
-  const handleMouseMove = useCallback((e) => {
-    if (!dragState) return;
+  const handleMouseMove = useCallback(
+    (e) => {
+      if (!dragState) return;
 
-    const timelineRef = timelineRefs.current[dragState.sectionIndex];
-    if (!timelineRef) return;
+      const timelineRef = timelineRefs.current[dragState.sectionIndex];
+      if (!timelineRef) return;
 
-    const timelineRect = timelineRef.getBoundingClientRect();
-    const beatWidth = timelineRect.width / BEATS_PER_SECTION;
-    const deltaBeats = Math.round((e.clientX - dragState.startX) / beatWidth);
+      const timelineRect = timelineRef.getBoundingClientRect();
+      const beatWidth = timelineRect.width / BEATS_PER_SECTION;
+      const deltaBeats = Math.round((e.clientX - dragState.startX) / beatWidth);
 
-    setSections(prevSections => prevSections.map((section, sIndex) => {
-      if (sIndex !== dragState.sectionIndex) return section;
+      setSections((prevSections) =>
+        prevSections.map((section, sIndex) => {
+          if (sIndex !== dragState.sectionIndex) return section;
 
-      return {
-        ...section,
-        chords: section.chords.map(chord => {
-          if (chord.id !== dragState.chordId) return chord;
+          return {
+            ...section,
+            chords: section.chords.map((chord) => {
+              if (chord.id !== dragState.chordId) return chord;
 
-          if (dragState.edge === 'right') {
-            const newDuration = Math.max(1, Math.min(
-              BEATS_PER_SECTION - chord.startBeat,
-              dragState.originalDuration + deltaBeats
-            ));
-            return { ...chord, duration: newDuration };
-          } else if (dragState.edge === 'left') {
-            const newStart = Math.max(0, Math.min(
-              dragState.originalStart + dragState.originalDuration - 1,
-              dragState.originalStart + deltaBeats
-            ));
-            const newDuration = dragState.originalDuration - (newStart - dragState.originalStart);
-            return { ...chord, startBeat: newStart, duration: newDuration };
-          }
-          return chord;
-        }),
-      };
-    }));
-  }, [dragState]);
+              if (dragState.edge === "right") {
+                const newDuration = Math.max(
+                  1,
+                  Math.min(
+                    BEATS_PER_SECTION - chord.startBeat,
+                    dragState.originalDuration + deltaBeats
+                  )
+                );
+                return { ...chord, duration: newDuration };
+              } else if (dragState.edge === "left") {
+                const newStart = Math.max(
+                  0,
+                  Math.min(
+                    dragState.originalStart + dragState.originalDuration - 1,
+                    dragState.originalStart + deltaBeats
+                  )
+                );
+                const newDuration =
+                  dragState.originalDuration -
+                  (newStart - dragState.originalStart);
+                return { ...chord, startBeat: newStart, duration: newDuration };
+              }
+              return chord;
+            }),
+          };
+        })
+      );
+    },
+    [dragState]
+  );
 
   const handleMouseUp = useCallback(() => {
     setDragState(null);
@@ -409,11 +584,11 @@ function ChordPlayer() {
 
   useEffect(() => {
     if (dragState) {
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
       return () => {
-        window.removeEventListener('mousemove', handleMouseMove);
-        window.removeEventListener('mouseup', handleMouseUp);
+        window.removeEventListener("mousemove", handleMouseMove);
+        window.removeEventListener("mouseup", handleMouseUp);
       };
     }
   }, [dragState, handleMouseMove, handleMouseUp]);
@@ -421,18 +596,18 @@ function ChordPlayer() {
   // Export MIDI (toutes les sections)
   const exportMidi = useCallback(() => {
     const allChords = sections.flatMap((section, sectionIndex) =>
-      section.chords.map(chord => ({
+      section.chords.map((chord) => ({
         ...chord,
-        startBeat: chord.startBeat + (sectionIndex * BEATS_PER_SECTION),
+        startBeat: chord.startBeat + sectionIndex * BEATS_PER_SECTION,
       }))
     );
 
     const midiData = generateMidiData(allChords, bpm);
-    const blob = new Blob([midiData], { type: 'audio/midi' });
+    const blob = new Blob([midiData], { type: "audio/midi" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = 'chord-progression.mid';
+    a.download = "chord-progression.mid";
     a.click();
     URL.revokeObjectURL(url);
   }, [sections, bpm]);
@@ -443,17 +618,19 @@ function ChordPlayer() {
     const match = chordName.match(/^([A-G][#b]?)/);
     const root = match ? match[1] : chordName;
     const colorInfo = getNoteColor(root);
-    return colorInfo?.color || 'hsl(245, 100%, 69%)';
+    return colorInfo?.color || "hsl(245, 100%, 69%)";
   };
 
   // Vérifier si des accords existent
-  const hasChords = sections.some(s => s.chords.length > 0);
+  const hasChords = sections.some((s) => s.chords.length > 0);
 
   return (
     <div className="chord-player">
       <div className="chord-player__header">
         <h3 className="chord-player__title">Chord Player</h3>
-        <span className="chord-player__section-count">{sections.length} section{sections.length > 1 ? 's' : ''}</span>
+        <span className="chord-player__section-count">
+          {sections.length} section{sections.length > 1 ? "s" : ""}
+        </span>
       </div>
 
       {/* Contrôles */}
@@ -473,10 +650,10 @@ function ChordPlayer() {
 
         <div className="chord-player__buttons">
           <button
-            className={`chord-player__btn chord-player__btn--play ${isPlaying ? 'chord-player__btn--active' : ''}`}
+            className={`chord-player__btn chord-player__btn--play ${isPlaying ? "chord-player__btn--active" : ""}`}
             onClick={playChords}
           >
-            {isPlaying ? '⏹ Stop' : '▶ Play'}
+            {isPlaying ? "⏹ Stop" : "▶ Play"}
           </button>
           <button
             className="chord-player__btn chord-player__btn--generate"
@@ -511,16 +688,24 @@ function ChordPlayer() {
         {sections.map((section, sectionIndex) => (
           <div
             key={section.id}
-            className={`chord-player__section ${currentSection === sectionIndex && isPlaying ? 'chord-player__section--active' : ''}`}
+            className={`chord-player__section ${currentSection === sectionIndex && isPlaying ? "chord-player__section--active" : ""}`}
           >
             {/* En-tête de section */}
             <div className="chord-player__section-header">
-              <span className="chord-player__section-title">Section {sectionIndex + 1}</span>
+              <span className="chord-player__section-title">
+                Section {sectionIndex + 1}
+              </span>
               <div className="chord-player__section-actions">
                 <div className="chord-player__progression-selector">
                   <button
                     className="chord-player__section-btn"
-                    onClick={() => setShowProgressionMenu(showProgressionMenu === sectionIndex ? null : sectionIndex)}
+                    onClick={() =>
+                      setShowProgressionMenu(
+                        showProgressionMenu === sectionIndex
+                          ? null
+                          : sectionIndex
+                      )
+                    }
                     title="Choisir une progression"
                   >
                     🎲
@@ -529,7 +714,9 @@ function ChordPlayer() {
                     <div className="chord-player__progression-menu">
                       <div className="chord-player__progression-menu-header">
                         <span>Choisir une progression</span>
-                        <button onClick={() => setShowProgressionMenu(null)}>×</button>
+                        <button onClick={() => setShowProgressionMenu(null)}>
+                          ×
+                        </button>
                       </div>
                       <div className="chord-player__progression-list">
                         {PROGRESSIONS.map((prog, idx) => (
@@ -539,14 +726,27 @@ function ChordPlayer() {
                             onClick={() => applyProgression(sectionIndex, prog)}
                             title={prog.description}
                           >
-                            <span className="chord-player__progression-name">{prog.label}</span>
-                            <span className="chord-player__progression-chords">{prog.chords.join(' - ')}</span>
+                            <span className="chord-player__progression-name">
+                              {prog.label}
+                            </span>
+                            <span className="chord-player__progression-chords">
+                              {prog.chords.join(" - ")}
+                            </span>
                           </button>
                         ))}
                       </div>
                     </div>
                   )}
                 </div>
+                {section.chords.length > 0 && (
+                  <button
+                    className="chord-player__section-btn"
+                    onClick={() => shuffleSectionChords(sectionIndex)}
+                    title="Mélanger les accords"
+                  >
+                    🔀
+                  </button>
+                )}
                 <button
                   className="chord-player__section-btn"
                   onClick={() => copySection(sectionIndex)}
@@ -555,7 +755,7 @@ function ChordPlayer() {
                   📄
                 </button>
                 <button
-                  className={`chord-player__section-btn ${!clipboard ? 'chord-player__section-btn--disabled' : ''}`}
+                  className={`chord-player__section-btn ${!clipboard ? "chord-player__section-btn--disabled" : ""}`}
                   onClick={() => pasteSection(sectionIndex)}
                   disabled={!clipboard}
                   title="Coller dans la section"
@@ -585,11 +785,13 @@ function ChordPlayer() {
             <div className="chord-player__timeline-container">
               {/* Indicateurs de mesure */}
               <div className="chord-player__measures">
-                {[...Array(BEATS_PER_SECTION / BEATS_PER_MEASURE)].map((_, i) => (
-                  <div key={i} className="chord-player__measure">
-                    Mesure {i + 1}
-                  </div>
-                ))}
+                {[...Array(BEATS_PER_SECTION / BEATS_PER_MEASURE)].map(
+                  (_, i) => (
+                    <div key={i} className="chord-player__measure">
+                      Mesure {i + 1}
+                    </div>
+                  )
+                )}
               </div>
 
               {/* Indicateurs de temps */}
@@ -597,7 +799,7 @@ function ChordPlayer() {
                 {[...Array(BEATS_PER_SECTION)].map((_, i) => (
                   <div
                     key={i}
-                    className={`chord-player__beat-marker ${i % BEATS_PER_MEASURE === 0 ? 'chord-player__beat-marker--strong' : ''}`}
+                    className={`chord-player__beat-marker ${i % BEATS_PER_MEASURE === 0 ? "chord-player__beat-marker--strong" : ""}`}
                   >
                     {i + 1}
                   </div>
@@ -606,12 +808,20 @@ function ChordPlayer() {
 
               {/* Grille de timeline */}
               <div
-                ref={el => timelineRefs.current[sectionIndex] = el}
+                ref={(el) => (timelineRefs.current[sectionIndex] = el)}
                 className="chord-player__timeline"
                 onClick={(e) => {
-                  if (e.target === e.currentTarget || e.target.classList.contains('chord-player__beat')) {
-                    const rect = timelineRefs.current[sectionIndex].getBoundingClientRect();
-                    const beat = Math.floor((e.clientX - rect.left) / (rect.width / BEATS_PER_SECTION));
+                  if (
+                    e.target === e.currentTarget ||
+                    e.target.classList.contains("chord-player__beat")
+                  ) {
+                    const rect =
+                      timelineRefs.current[
+                        sectionIndex
+                      ].getBoundingClientRect();
+                    const beat = Math.floor(
+                      (e.clientX - rect.left) / (rect.width / BEATS_PER_SECTION)
+                    );
                     addChord(sectionIndex, beat);
                   }
                 }}
@@ -621,8 +831,10 @@ function ChordPlayer() {
                   <div
                     key={i}
                     className={`chord-player__beat ${
-                      i % BEATS_PER_MEASURE === 0 ? 'chord-player__beat--measure' : ''
-                    } ${currentSection === sectionIndex && currentBeat === i ? 'chord-player__beat--current' : ''}`}
+                      i % BEATS_PER_MEASURE === 0
+                        ? "chord-player__beat--measure"
+                        : ""
+                    } ${currentSection === sectionIndex && currentBeat === i ? "chord-player__beat--current" : ""}`}
                   />
                 ))}
 
@@ -634,8 +846,8 @@ function ChordPlayer() {
                       currentSection === sectionIndex &&
                       currentBeat >= chord.startBeat &&
                       currentBeat < chord.startBeat + chord.duration
-                        ? 'chord-player__chord--playing'
-                        : ''
+                        ? "chord-player__chord--playing"
+                        : ""
                     }`}
                     style={{
                       left: `${(chord.startBeat / BEATS_PER_SECTION) * 100}%`,
@@ -646,12 +858,18 @@ function ChordPlayer() {
                   >
                     <div
                       className="chord-player__chord-handle chord-player__chord-handle--left"
-                      onMouseDown={(e) => handleMouseDown(e, sectionIndex, chord, 'left')}
+                      onMouseDown={(e) =>
+                        handleMouseDown(e, sectionIndex, chord, "left")
+                      }
                     />
 
                     <div className="chord-player__chord-content">
-                      <span className="chord-player__chord-name">{chord.name}</span>
-                      <span className="chord-player__chord-duration">{chord.duration}t</span>
+                      <span className="chord-player__chord-name">
+                        {chord.name}
+                      </span>
+                      <span className="chord-player__chord-duration">
+                        {chord.duration}t
+                      </span>
                     </div>
 
                     <button
@@ -669,7 +887,9 @@ function ChordPlayer() {
 
                     <div
                       className="chord-player__chord-handle chord-player__chord-handle--right"
-                      onMouseDown={(e) => handleMouseDown(e, sectionIndex, chord, 'right')}
+                      onMouseDown={(e) =>
+                        handleMouseDown(e, sectionIndex, chord, "right")
+                      }
                     />
                   </div>
                 ))}
@@ -678,7 +898,9 @@ function ChordPlayer() {
                 {currentSection === sectionIndex && currentBeat >= 0 && (
                   <div
                     className="chord-player__playhead"
-                    style={{ left: `${(currentBeat / BEATS_PER_SECTION) * 100}%` }}
+                    style={{
+                      left: `${(currentBeat / BEATS_PER_SECTION) * 100}%`,
+                    }}
                   />
                 )}
               </div>
@@ -689,7 +911,10 @@ function ChordPlayer() {
 
       {/* Instructions */}
       <div className="chord-player__instructions">
-        <p>Cliquez sur la timeline pour ajouter un accord. Glissez les bords pour ajuster la durée. Utilisez "+ Section" pour ajouter plus de mesures.</p>
+        <p>
+          Cliquez sur la timeline pour ajouter un accord. Glissez les bords pour
+          ajuster la durée. Utilisez "+ Section" pour ajouter plus de mesures.
+        </p>
       </div>
 
       {/* Modal d'édition */}
@@ -708,7 +933,10 @@ function ChordPlayer() {
 
       {/* Modal de gestion des playlists */}
       {showPlaylistModal && (
-        <div className="playlist-modal-overlay" onClick={() => setShowPlaylistModal(false)}>
+        <div
+          className="playlist-modal-overlay"
+          onClick={() => setShowPlaylistModal(false)}
+        >
           <div className="playlist-modal" onClick={(e) => e.stopPropagation()}>
             <div className="playlist-modal__header">
               <h3>Gestion des Playlists</h3>
@@ -729,7 +957,9 @@ function ChordPlayer() {
                   value={newPlaylistName}
                   onChange={(e) => setNewPlaylistName(e.target.value)}
                   className="playlist-modal__input"
-                  onKeyDown={(e) => e.key === 'Enter' && saveAsPlaylist(newPlaylistName)}
+                  onKeyDown={(e) =>
+                    e.key === "Enter" && saveAsPlaylist(newPlaylistName)
+                  }
                 />
                 <button
                   className="playlist-modal__save-btn"
@@ -743,14 +973,19 @@ function ChordPlayer() {
               {/* Liste des playlists */}
               <div className="playlist-modal__list">
                 {playlists.length === 0 ? (
-                  <p className="playlist-modal__empty">Aucune playlist sauvegardée</p>
+                  <p className="playlist-modal__empty">
+                    Aucune playlist sauvegardée
+                  </p>
                 ) : (
                   playlists.map((playlist) => (
                     <div key={playlist.id} className="playlist-modal__item">
                       <div className="playlist-modal__item-info">
-                        <span className="playlist-modal__item-name">{playlist.name}</span>
+                        <span className="playlist-modal__item-name">
+                          {playlist.name}
+                        </span>
                         <span className="playlist-modal__item-meta">
-                          {playlist.bpm} BPM • {playlist.sections.length} section{playlist.sections.length > 1 ? 's' : ''}
+                          {playlist.bpm} BPM • {playlist.sections.length}{" "}
+                          section{playlist.sections.length > 1 ? "s" : ""}
                         </span>
                       </div>
                       <div className="playlist-modal__item-actions">
@@ -804,27 +1039,52 @@ function generateMidiData(chords, bpm) {
   const microsecondsPerBeat = Math.round(60000000 / bpm);
 
   const header = new Uint8Array([
-    0x4D, 0x54, 0x68, 0x64,
-    0x00, 0x00, 0x00, 0x06,
-    0x00, 0x00,
-    0x00, 0x01,
-    (ticksPerBeat >> 8) & 0xFF, ticksPerBeat & 0xFF,
+    0x4d,
+    0x54,
+    0x68,
+    0x64,
+    0x00,
+    0x00,
+    0x00,
+    0x06,
+    0x00,
+    0x00,
+    0x00,
+    0x01,
+    (ticksPerBeat >> 8) & 0xff,
+    ticksPerBeat & 0xff,
   ]);
 
   const events = [];
 
-  events.push([0x00, 0xFF, 0x51, 0x03,
-    (microsecondsPerBeat >> 16) & 0xFF,
-    (microsecondsPerBeat >> 8) & 0xFF,
-    microsecondsPerBeat & 0xFF
+  events.push([
+    0x00,
+    0xff,
+    0x51,
+    0x03,
+    (microsecondsPerBeat >> 16) & 0xff,
+    (microsecondsPerBeat >> 8) & 0xff,
+    microsecondsPerBeat & 0xff,
   ]);
 
   const noteToMidi = {
-    'C': 60, 'C#': 61, 'Db': 61,
-    'D': 62, 'D#': 63, 'Eb': 63,
-    'E': 64, 'F': 65, 'F#': 66, 'Gb': 66,
-    'G': 67, 'G#': 68, 'Ab': 68,
-    'A': 69, 'A#': 70, 'Bb': 70, 'B': 71
+    C: 60,
+    "C#": 61,
+    Db: 61,
+    D: 62,
+    "D#": 63,
+    Eb: 63,
+    E: 64,
+    F: 65,
+    "F#": 66,
+    Gb: 66,
+    G: 67,
+    "G#": 68,
+    Ab: 68,
+    A: 69,
+    "A#": 70,
+    Bb: 70,
+    B: 71,
   };
 
   let currentTick = 0;
@@ -842,7 +1102,9 @@ function generateMidiData(chords, bpm) {
       const midiNote = noteToMidi[note] || 60;
       events.push([
         ...(i === 0 ? encodeVariableLength(delta) : [0x00]),
-        0x90, midiNote, 0x64
+        0x90,
+        midiNote,
+        0x64,
       ]);
     });
 
@@ -850,26 +1112,33 @@ function generateMidiData(chords, bpm) {
       const midiNote = noteToMidi[note] || 60;
       events.push([
         ...(i === 0 ? encodeVariableLength(duration) : [0x00]),
-        0x80, midiNote, 0x00
+        0x80,
+        midiNote,
+        0x00,
       ]);
     });
 
     currentTick = startTick + duration;
   });
 
-  events.push([0x00, 0xFF, 0x2F, 0x00]);
+  events.push([0x00, 0xff, 0x2f, 0x00]);
 
   const trackData = events.flat();
 
   const trackHeader = new Uint8Array([
-    0x4D, 0x54, 0x72, 0x6B,
-    (trackData.length >> 24) & 0xFF,
-    (trackData.length >> 16) & 0xFF,
-    (trackData.length >> 8) & 0xFF,
-    trackData.length & 0xFF,
+    0x4d,
+    0x54,
+    0x72,
+    0x6b,
+    (trackData.length >> 24) & 0xff,
+    (trackData.length >> 16) & 0xff,
+    (trackData.length >> 8) & 0xff,
+    trackData.length & 0xff,
   ]);
 
-  const result = new Uint8Array(header.length + trackHeader.length + trackData.length);
+  const result = new Uint8Array(
+    header.length + trackHeader.length + trackData.length
+  );
   result.set(header, 0);
   result.set(trackHeader, header.length);
   result.set(new Uint8Array(trackData), header.length + trackHeader.length);
@@ -880,10 +1149,10 @@ function generateMidiData(chords, bpm) {
 function encodeVariableLength(value) {
   if (value < 128) return [value];
   const bytes = [];
-  bytes.push(value & 0x7F);
+  bytes.push(value & 0x7f);
   value >>= 7;
   while (value > 0) {
-    bytes.unshift((value & 0x7F) | 0x80);
+    bytes.unshift((value & 0x7f) | 0x80);
     value >>= 7;
   }
   return bytes;
